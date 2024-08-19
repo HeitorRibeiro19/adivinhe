@@ -1,0 +1,139 @@
+let tela = 0; // Variável que controla qual tela está sendo mostrada (0: menu inicial, 1: jogo, 2: instruções)
+
+let numeroSecreto;
+let tentativas;
+let numeroMaximo = 100;
+let input;
+let button;
+let feedback;
+
+function setup() {
+  createCanvas(400, 400);
+  
+  // Inicializar elementos do jogo
+  iniciarElementosDoJogo();
+}
+
+function draw() {
+  background(0);
+  
+  if (tela === 0) {
+    mostrarMenu();
+  } else if (tela === 1) {
+    iniciarJogo();
+  } else if (tela === 2) {
+    mostrarInstrucoes();
+  }
+}
+
+function mostrarMenu() {
+  textAlign(CENTER);
+  textSize(35);
+  fill(0,200,0);
+  text("ADIVINHE O NÚMERO", width / 2, height / 2 - 50);
+  
+  // Botão "Iniciar Jogo"
+  if (mouseX > 140 && mouseX < 260 && mouseY > 200 && mouseY < 230) {
+    fill(0,220,0);
+    if (mouseIsPressed) {
+      tela = 1; // Mudar para a tela do jogo
+      resetarJogo(); // Reiniciar o jogo ao entrar na tela de jogo
+    }
+  } else {
+    fill(0,120,0);
+  }
+  rect(140, 200, 120, 30);
+  
+  fill(0,0,0);
+  textSize(16);
+  text("INICIAR", 200, 220);
+  
+  // Botão "Instruções"
+  if (mouseX > 140 && mouseX < 260 && mouseY > 250 && mouseY < 280) {
+    fill(0,220,0);
+    if (mouseIsPressed) {
+      tela = 2; // Mudar para a tela de instruções
+    }
+  } else {
+    fill(0,120,0);
+  }
+  rect(140, 250, 120, 30);
+  
+  fill(0,0,0);
+  text("INSTRUÇÕES", 200, 270);
+}
+
+function iniciarJogo() {
+  background(0,150,0);
+  // O input e o botão serão visíveis apenas na tela do jogo
+  input.show();
+  button.show();
+  feedback.show();
+}
+
+function mostrarInstrucoes() {
+  background(0);
+  let s = 'Um jogador tenta adivinhar um número dentro do intervalo de 1 a 100. O jogo acaba quando ele acerta.';
+  fill(0, 200, 0);
+  textSize(20);
+  text(s, 60, 100, 280, 100);
+  textSize(12);
+  text("Pressione ESC para voltar ao menu", width / 2, height / 2 + 180);
+}
+
+function iniciarElementosDoJogo() {
+  numeroSecreto = Math.floor(random(numeroMaximo)) + 1;
+  tentativas = 0;
+
+  input = createInput();
+  input.position(20, 20);
+  input.hide(); // Esconder inicialmente
+
+  button = createButton('Adivinhar');
+  button.position(input.x + input.width, 20);
+  button.mousePressed(verificarNumero);
+  button.hide(); // Esconder inicialmente
+
+  feedback = createElement('h2', 'Tente adivinhar o número!');
+  feedback.position(20, 60);
+  feedback.style('font-size', '20px'); // Ajusta o tamanho da fonte
+  feedback.style('max-width', '360px'); // Limita a largura do texto para não sair do canvas
+  feedback.hide(); // Esconder inicialmente
+}
+
+function verificarNumero() {
+  const chute = parseInt(input.value());
+  tentativas++;
+
+  if (chute === numeroSecreto) {
+    feedback.html(`Parabéns! Você acertou o número ${numeroSecreto} em ${tentativas} tentativas.`);
+    input.attribute('disabled', '');
+    button.attribute('disabled', '');
+  } else if (chute > numeroSecreto) {
+    feedback.html('Tente um número menor.');
+  } else {
+    feedback.html('Tente um número maior.');
+  }
+}
+
+function resetarJogo() {
+  numeroSecreto = Math.floor(random(numeroMaximo)) + 1;
+  tentativas = 0;
+  input.value('');
+  input.removeAttribute('disabled');
+  button.removeAttribute('disabled');
+  feedback.html('Tente adivinhar o número!');
+  
+  input.show(); // Mostrar elementos do jogo
+  button.show();
+  feedback.show();
+}
+
+function keyPressed() {
+  if (keyCode === ESCAPE && (tela === 1 || tela === 2)) {
+    tela = 0; // Voltar para o menu ao pressionar ESC
+    input.hide(); // Esconder os elementos do jogo ao voltar ao menu
+    button.hide();
+    feedback.hide();
+  }
+}
